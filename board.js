@@ -21,12 +21,15 @@
     all:    { salt: 3, top: 61000, decay: 0.985, size: 200 },
   });
 
-  const NAMES = Object.freeze([
-    'NEO_BYTE', 'PIXEL_PAL', 'LASERCAT', 'KRYPTON', 'GLITCHY', 'TURBO_T',
-    'ZERO_COOL', 'SYNTHWAVE', 'ARCADIA', 'BYTE_ME', 'NIGHT_OWL', 'COSMO',
-    'RETRO_RAY', 'MAXWELL', 'QUARK', 'DISCO_DOT', 'VOLT', 'STARDUST',
-    'CRT_KID', 'LUNA_8', 'BOSS_FIGHT', 'ROMAN_8', 'TETRA', 'HYPERLOOP', 'NOVA_9',
-  ]);
+  
+const NAMES = Object.freeze([
+  'Skirk', 'Aether', 'Lumine', 'Furina', 'Arlecchino',
+  'Neuvillette', 'Childe', 'Scaramouche', 'Xiao', 'Kaeya',
+  'Alhaitham', 'Kazuha', 'Ayato', 'Wanderer', 'Dainsleif',
+  'Astra', 'Kairo', 'Lucien', 'Evelyn', 'Riven',
+  'Soren', 'Akira', 'Luna', 'Rin', 'Kieran',
+]);
+
 
   const DEFAULT_LIMIT = 10;
   const AVATAR_CACHE_MAX = 500;
