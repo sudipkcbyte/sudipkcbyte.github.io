@@ -1,26 +1,62 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#080519" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="application-name" content="RAREBYTE" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="RAREBYTE" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <title>RAREBYTE — The Retro Arcade Daily Trivia Where Rare Answers Win</title>
     <meta
       name="description"
-      content="RAREBYTE — Retro arcade daily trivia challenge where rarer answers earn higher points."
+      content="RAREBYTE — Retro arcade daily trivia challenge where rarer answers earn higher points. 7 questions, 25 seconds each. How rare is your answer?"
     />
-    <title>RAREBYTE</title>
+    <meta name="keywords" content="daily trivia, retro arcade, rare answers, quiz game, leaderboard, pixel game" />
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="RAREBYTE" />
+    <meta property="og:title" content="RAREBYTE — Think different. Score higher." />
+    <meta
+      property="og:description"
+      content="A retro arcade daily trivia challenge. The rarer your answer, the more points you score."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="RAREBYTE — Think different. Score higher." />
+    <meta
+      name="twitter:description"
+      content="A retro arcade daily trivia challenge. The rarer your answer, the more points you score."
+    />
+
+    <!-- Favicon (inline SVG, no extra request) -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23080519'/%3E%3Cpath fill='%23ffd23f' d='M3 3h8v2h2v4h-2v2H5v2H3z'/%3E%3Cpath fill='%2300e5ff' d='M5 5h4v2H5z'/%3E%3C/svg%3E"
+    />
+
+    <!-- Fonts: preconnect, load without blocking render, fall back gracefully -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+    />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
     />
     <link rel="stylesheet" href="style.css" />
+    <link rel="preload" href="style.css" as="style" />
   </head>
+
   <body>
-    <a class="btn ghost" href="#main-content" style="position: fixed; left: -9999px">
-      SKIP TO CONTENT
-    </a>
+    <a class="skip-link" href="#main-content">SKIP TO CONTENT</a>
 
     <div class="sky" aria-hidden="true">
       <div class="stars"></div>
@@ -29,7 +65,7 @@
 
     <header>
       <div class="bar">
-        <a class="logo" href="#home">RAREBYTE</a>
+        <a class="logo" href="#home" aria-label="RAREBYTE home">RAREBYTE</a>
         <nav aria-label="Main">
           <a href="#home" data-v="home">HOME</a>
           <a href="#play" data-v="play">PLAY</a>
@@ -39,30 +75,40 @@
           <a href="#how" data-v="how">HOW TO PLAY</a>
         </nav>
         <div class="tools">
-          <button class="btn ghost" id="snd" type="button" aria-pressed="true">SOUND ON</button>
+          <button class="btn ghost" id="snd" type="button" aria-pressed="true" aria-label="Toggle sound">
+            SOUND ON
+          </button>
           <a class="btn ghost" href="#login" id="loginBtn">LOGIN</a>
         </div>
       </div>
     </header>
 
+    <noscript>
+      <div class="panel noscript">
+        <h2>JAVASCRIPT REQUIRED</h2>
+        <p>RAREBYTE is an interactive game and needs JavaScript to run. Please enable it and reload the page.</p>
+      </div>
+    </noscript>
+
     <main id="main-content" tabindex="-1">
+      <!-- ============ HOME ============ -->
       <section class="view" id="v-home" aria-labelledby="homeTitle" hidden>
         <div class="hero">
           <div class="blink" aria-hidden="true">INSERT A COIN TO CONTINUE</div>
-          <h1 id="homeTitle" style="margin-top: 14px">
+          <h1 id="homeTitle" class="mt-14">
             THINK DIFFERENT.<br /><span class="y">SCORE HIGHER.</span>
           </h1>
           <p class="sub">Every answer has a value. How rare is yours?</p>
           <div class="cta">
             <a class="btn big" id="playBtn" href="#play">PLAY TODAY'S CHALLENGE</a>
             <div>
-              <div class="dim" style="font-size: 18px">NEXT CHALLENGE IN</div>
-              <div class="count" id="cd" aria-live="off">--:--:--</div>
+              <div class="dim fs-18" id="cdLabel">NEXT CHALLENGE IN</div>
+              <div class="count" id="cd" role="timer" aria-labelledby="cdLabel" aria-live="off">--:--:--</div>
             </div>
           </div>
         </div>
 
-        <div class="grid g3" style="margin-bottom: 16px">
+        <div class="grid g3 mb-16" role="group" aria-label="Today's stats">
           <div class="stat"><span>PLAYERS TODAY</span><b id="hPlayers">18,420</b></div>
           <div class="stat"><span>ANSWERS SUBMITTED</span><b id="hAns">64,310</b></div>
           <div class="stat"><span>CHALLENGE</span><b id="hNum">#326</b></div>
@@ -71,11 +117,260 @@
         <div class="grid g2">
           <div class="panel">
             <h2>TOP 5 TODAY</h2>
-            <div class="tw"><table id="hLb"></table></div>
-            <p class="note" style="margin-top: 10px">Sample leaderboard for this demo.</p>
+            <div class="tw"><table id="hLb" aria-label="Top 5 players today"></table></div>
+            <p class="note mt-10">Sample leaderboard for this demo.</p>
             <a class="btn ghost" href="#leaderboard">FULL LEADERBOARD</a>
           </div>
           <div class="panel">
             <h2>DAILY STREAK</h2>
-            <div class="pips" id="hPips" aria-label="Daily streak progress"></div>
-            <p id="h
+            <div class="pips" id="hPips" role="img" aria-label="Daily streak progress"></div>
+            <p id="hStreak"></p>
+            <p class="note">Finish each daily challenge to keep your streak alive.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PLAY ============ -->
+      <section class="view" id="v-play" aria-labelledby="pQ" hidden>
+        <div class="panel">
+          <div class="hud" role="group" aria-label="Game status">
+            <span id="pMode">DAILY #326</span>
+            <span>Q <b id="pQn">1</b>/7</span>
+            <span>SCORE <b id="pSc">0</b></span>
+            <span><b id="pT">25</b>s</span>
+          </div>
+          <div
+            class="timer"
+            id="pBar"
+            role="progressbar"
+            aria-label="Time remaining"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="100"
+          >
+            <i></i>
+          </div>
+          <h2 class="q" id="pQ"></h2>
+          <form class="ans" id="pForm" autocomplete="off" novalidate>
+            <label class="sr-only" for="pIn">Your answer</label>
+            <input
+              id="pIn"
+              name="answer"
+              type="text"
+              maxlength="40"
+              placeholder="TYPE YOUR ANSWER"
+              enterkeyhint="send"
+              autocapitalize="off"
+              autocorrect="off"
+              spellcheck="false"
+              aria-describedby="pHint"
+            />
+            <button class="btn" id="pGo" type="submit">LOCK IT IN</button>
+          </form>
+          <p class="note" id="pHint" role="status" aria-live="polite"></p>
+          <div class="rev" id="pRev" role="region" aria-label="Answer result" aria-live="polite" hidden>
+            <span class="tier" id="rTier"></span>
+            <div class="pts" id="rPts"></div>
+            <p id="rTxt" class="mt-10"></p>
+            <div class="meter" aria-hidden="true"><i id="rMeter"></i></div>
+            <button class="btn alt" id="pNext" type="button">NEXT</button>
+          </div>
+        </div>
+        <p class="note mt-14">
+          Rarity stays hidden until you answer. One answer per question, 25 seconds each.
+        </p>
+      </section>
+
+      <!-- ============ RESULTS ============ -->
+      <section class="view" id="v-results" aria-labelledby="resTitle" hidden>
+        <div class="panel ta-center">
+          <div class="blink" aria-hidden="true">CHALLENGE COMPLETE!</div>
+          <h1 id="resTitle" class="mt-12">DAILY ARCADE RESULTS</h1>
+          <div class="score" id="sTot" aria-live="polite">0 PTS</div>
+          <div class="y fs-px-10" id="sBest"></div>
+          <div class="grid g3 results-stats" role="group" aria-label="Your results">
+            <div class="stat"><span>CORRECT ANSWERS</span><b id="sCor"></b></div>
+            <div class="stat"><span>GLOBAL RANK</span><b id="sRank"></b></div>
+            <div class="stat"><span>RAREST ANSWER</span><b id="sRare"></b></div>
+            <div class="stat"><span>PERSONAL BEST</span><b id="sPB"></b></div>
+            <div class="stat"><span>CURRENT STREAK</span><b id="sStr"></b></div>
+            <div class="stat"><span>RANK TITLE</span><b id="sTitle" class="fs-px-11"></b></div>
+          </div>
+          <div class="tw ta-left"><table id="sTable" aria-label="Your answers and points"></table></div>
+          <div class="cta jc-center">
+            <button class="btn" id="shareBtn" type="button">SHARE RESULTS</button>
+            <a class="btn alt" href="#leaderboard">LEADERBOARD</a>
+          </div>
+          <p class="note" id="shareMsg" role="status" aria-live="polite"></p>
+          <p class="note">
+            Keep playing to climb the leaderboard. Rarity here is simulated from a sample field of
+            players.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ LEADERBOARD ============ -->
+      <section class="view" id="v-leaderboard" aria-labelledby="lbTitle" hidden>
+        <h1 id="lbTitle">LEADERBOARD</h1>
+        <div class="tabs" role="tablist" aria-label="Leaderboard timeframe">
+          <button
+            class="tab on"
+            id="tab-daily"
+            data-b="daily"
+            type="button"
+            role="tab"
+            aria-selected="true"
+            aria-controls="lbPanel"
+          >
+            DAILY
+          </button>
+          <button
+            class="tab"
+            id="tab-weekly"
+            data-b="weekly"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            aria-controls="lbPanel"
+          >
+            WEEKLY
+          </button>
+          <button
+            class="tab"
+            id="tab-all"
+            data-b="all"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            aria-controls="lbPanel"
+          >
+            ALL-TIME
+          </button>
+        </div>
+        <div class="panel" id="lbPanel" role="tabpanel" aria-live="polite">
+          <div class="tw"><table id="lbT" aria-label="Leaderboard rankings"></table></div>
+        </div>
+        <p class="note mt-12">
+          Demo boards with sample players. Your row is highlighted once you play.
+        </p>
+      </section>
+
+      <!-- ============ ARCHIVES ============ -->
+      <section class="view" id="v-archives" aria-labelledby="arcTitle" hidden>
+        <h1 id="arcTitle">CHALLENGE ARCHIVES</h1>
+        <p class="dim">
+          Replay earlier challenges for practice. Archive runs do not change your streak or ranking.
+        </p>
+        <div class="grid g2" id="arcList"></div>
+      </section>
+
+      <!-- ============ PROFILE ============ -->
+      <section class="view" id="v-profile" aria-labelledby="prName" hidden>
+        <div class="panel">
+          <div class="who who-profile">
+            <img class="av l" id="prAv" alt="Your pixel avatar" width="96" height="96" />
+            <div>
+              <h1 id="prName" class="m-0-6"></h1>
+              <div class="note" id="prNote"></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid g3 my-16" id="prStats" role="group" aria-label="Your stats"></div>
+        <h2>ACHIEVEMENTS</h2>
+        <div class="grid g2" id="prAch"></div>
+      </section>
+
+      <!-- ============ HOW TO PLAY ============ -->
+      <section class="view" id="v-how" aria-labelledby="howTitle" hidden>
+        <h1 id="howTitle">HOW TO PLAY</h1>
+        <div class="grid g2">
+          <div class="panel">
+            <h2>THE GAME</h2>
+            <p>
+              Every question has many correct answers. The fewer players who give your answer, the
+              more points it earns.
+            </p>
+            <p>
+              Everyone gets the same 7 questions each day. You have 25 seconds for each and one
+              answer per question.
+            </p>
+            <p>
+              Wrong answers score zero. The rarity of an answer stays hidden until you lock yours
+              in.
+            </p>
+          </div>
+          <div class="panel">
+            <h2>SCORING</h2>
+            <div class="rows" role="list">
+              <div class="row" role="listitem"><span>Very common (10%+ of players)</span><b class="y">10</b></div>
+              <div class="row" role="listitem"><span>Common (4-10%)</span><b class="y">25</b></div>
+              <div class="row" role="listitem"><span>Uncommon (1.5-4%)</span><b class="y">50</b></div>
+              <div class="row" role="listitem"><span>Rare (0.5-1.5%)</span><b class="y">100</b></div>
+              <div class="row" role="listitem"><span>Extremely rare (under 0.5%)</span><b class="y">200</b></div>
+            </div>
+            <p class="note mt-10">
+              Tiers come from how often each answer is given. In this demo the field is simulated.
+            </p>
+          </div>
+        </div>
+        <div class="cta"><a class="btn big" href="#play">PLAY NOW</a></div>
+      </section>
+
+      <!-- ============ LOGIN ============ -->
+      <section class="view" id="v-login" aria-labelledby="loginTitle" hidden>
+        <div class="panel panel-narrow">
+          <h1 id="loginTitle">LOGIN / REGISTER</h1>
+          <form id="lgForm">
+            <label for="lgName">USERNAME</label>
+            <input
+              id="lgName"
+              name="username"
+              type="text"
+              maxlength="16"
+              required
+              autocomplete="username"
+              autocapitalize="off"
+              spellcheck="false"
+              placeholder="PLAYER_ONE"
+            />
+            <label for="lgPass">PASSWORD</label>
+            <input
+              id="lgPass"
+              name="password"
+              type="password"
+              autocomplete="new-password"
+              placeholder="DEMO ONLY"
+              aria-describedby="lgNote"
+            />
+            <div class="cta"><button class="btn" type="submit">START NEW PROFILE</button></div>
+          </form>
+          <p class="note" id="lgNote">
+            Demo only. Nothing is sent anywhere. Your profile is saved in this browser. A real build
+            would use Supabase auth.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p class="note">RAREBYTE &copy; <span id="yr">2026</span> &mdash; A new challenge every day.</p>
+    </footer>
+
+    <script src="utils.js" defer></script>
+    <script src="data.js" defer></script>
+    <script src="storage.js" defer></script>
+    <script src="audio.js" defer></script>
+    <script src="art.js" defer></script>
+    <script src="board.js" defer></script>
+    <script src="game.js" defer></script>
+    <script src="views.js" defer></script>
+    <script src="main.js" defer></script>
+    <script defer>
+      // Keeps the footer year current without touching your other scripts.
+      document.addEventListener("DOMContentLoaded", function () {
+        var y = document.getElementById("yr");
+        if (y) y.textContent = new Date().getFullYear();
+      });
+    </script>
+  </body>
+</html>
