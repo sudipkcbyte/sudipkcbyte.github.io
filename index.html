@@ -3,7 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#080519" />
+    <meta
+      name="description"
+      content="RAREBYTE — Retro arcade daily trivia challenge where rarer answers earn higher points."
+    />
     <title>RAREBYTE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
@@ -11,31 +18,38 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <a class="btn ghost" href="#main-content" style="position: fixed; left: -9999px">
+      SKIP TO CONTENT
+    </a>
+
     <div class="sky" aria-hidden="true">
       <div class="stars"></div>
       <div class="floor"></div>
     </div>
+
     <header>
       <div class="bar">
         <a class="logo" href="#home">RAREBYTE</a>
         <nav aria-label="Main">
-          <a href="#home" data-v="home">HOME</a><a href="#play" data-v="play">PLAY</a
-          ><a href="#leaderboard" data-v="leaderboard">LEADERBOARD</a
-          ><a href="#archives" data-v="archives">ARCHIVES</a
-          ><a href="#profile" data-v="profile">PROFILE</a
-          ><a href="#how" data-v="how">HOW TO PLAY</a>
+          <a href="#home" data-v="home">HOME</a>
+          <a href="#play" data-v="play">PLAY</a>
+          <a href="#leaderboard" data-v="leaderboard">LEADERBOARD</a>
+          <a href="#archives" data-v="archives">ARCHIVES</a>
+          <a href="#profile" data-v="profile">PROFILE</a>
+          <a href="#how" data-v="how">HOW TO PLAY</a>
         </nav>
         <div class="tools">
-          <button class="btn ghost" id="snd" type="button" aria-pressed="true">SOUND ON</button
-          ><a class="btn ghost" href="#login" id="loginBtn">LOGIN</a>
+          <button class="btn ghost" id="snd" type="button" aria-pressed="true">SOUND ON</button>
+          <a class="btn ghost" href="#login" id="loginBtn">LOGIN</a>
         </div>
       </div>
     </header>
-    <main>
-      <section class="view" id="v-home" hidden>
+
+    <main id="main-content" tabindex="-1">
+      <section class="view" id="v-home" aria-labelledby="homeTitle" hidden>
         <div class="hero">
-          <div class="blink">INSERT A COIN TO CONTINUE</div>
-          <h1 style="margin-top: 14px">
+          <div class="blink" aria-hidden="true">INSERT A COIN TO CONTINUE</div>
+          <h1 id="homeTitle" style="margin-top: 14px">
             THINK DIFFERENT.<br /><span class="y">SCORE HIGHER.</span>
           </h1>
           <p class="sub">Every answer has a value. How rare is yours?</p>
@@ -43,15 +57,17 @@
             <a class="btn big" id="playBtn" href="#play">PLAY TODAY'S CHALLENGE</a>
             <div>
               <div class="dim" style="font-size: 18px">NEXT CHALLENGE IN</div>
-              <div class="count" id="cd">--:--:--</div>
+              <div class="count" id="cd" aria-live="off">--:--:--</div>
             </div>
           </div>
         </div>
+
         <div class="grid g3" style="margin-bottom: 16px">
           <div class="stat"><span>PLAYERS TODAY</span><b id="hPlayers">18,420</b></div>
           <div class="stat"><span>ANSWERS SUBMITTED</span><b id="hAns">64,310</b></div>
           <div class="stat"><span>CHALLENGE</span><b id="hNum">#326</b></div>
         </div>
+
         <div class="grid g2">
           <div class="panel">
             <h2>TOP 5 TODAY</h2>
@@ -61,21 +77,24 @@
           </div>
           <div class="panel">
             <h2>DAILY STREAK</h2>
-            <div class="pips" id="hPips"></div>
+            <div class="pips" id="hPips" aria-label="Daily streak progress"></div>
             <p id="hStreak"></p>
             <p class="note">Finish each daily challenge to keep your streak alive.</p>
           </div>
         </div>
       </section>
 
-      <section class="view" id="v-play" hidden>
+      <section class="view" id="v-play" aria-labelledby="pQ" hidden>
         <div class="panel">
           <div class="hud">
-            <span id="pMode">DAILY #326</span><span>Q <b id="pQn">1</b>/7</span
-            ><span>SCORE <b id="pSc">0</b></span
-            ><span><b id="pT">25</b>s</span>
+            <span id="pMode">DAILY #326</span>
+            <span>Q <b id="pQn">1</b>/7</span>
+            <span>SCORE <b id="pSc">0</b></span>
+            <span><b id="pT">25</b>s</span>
           </div>
-          <div class="timer" id="pBar"><i></i></div>
+          <div class="timer" id="pBar" role="progressbar" aria-label="Time remaining" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+            <i></i>
+          </div>
           <h2 class="q" id="pQ" style="color: var(--fg)"></h2>
           <form class="ans" id="pForm" autocomplete="off">
             <input
@@ -84,14 +103,15 @@
               maxlength="40"
               placeholder="TYPE YOUR ANSWER"
               aria-label="Your answer"
-            /><button class="btn" id="pGo" type="submit">LOCK IT IN</button>
+            />
+            <button class="btn" id="pGo" type="submit">LOCK IT IN</button>
           </form>
-          <p class="note" id="pHint"></p>
-          <div class="rev" id="pRev" hidden>
+          <p class="note" id="pHint" role="status" aria-live="polite"></p>
+          <div class="rev" id="pRev" role="region" aria-label="Answer result" aria-live="polite" hidden>
             <span class="tier" id="rTier"></span>
             <div class="pts" id="rPts"></div>
             <p id="rTxt" style="margin-top: 10px"></p>
-            <div class="meter"><i id="rMeter"></i></div>
+            <div class="meter" aria-hidden="true"><i id="rMeter"></i></div>
             <button class="btn alt" id="pNext" type="button">NEXT</button>
           </div>
         </div>
@@ -100,10 +120,10 @@
         </p>
       </section>
 
-      <section class="view" id="v-results" hidden>
+      <section class="view" id="v-results" aria-labelledby="resTitle" hidden>
         <div class="panel" style="text-align: center">
-          <div class="blink">CHALLENGE COMPLETE!</div>
-          <h2 style="margin-top: 12px">DAILY ARCADE RESULTS</h2>
+          <div class="blink" aria-hidden="true">CHALLENGE COMPLETE!</div>
+          <h1 id="resTitle" style="margin-top: 12px">DAILY ARCADE RESULTS</h1>
           <div class="score" id="sTot">0 PTS</div>
           <div class="y" id="sBest" style="font: 10px var(--px)"></div>
           <div class="grid g3" style="margin: 22px 0; text-align: left">
@@ -118,10 +138,10 @@
           </div>
           <div class="tw" style="text-align: left"><table id="sTable"></table></div>
           <div class="cta" style="justify-content: center">
-            <button class="btn" id="shareBtn" type="button">SHARE RESULTS</button
-            ><a class="btn alt" href="#leaderboard">LEADERBOARD</a>
+            <button class="btn" id="shareBtn" type="button">SHARE RESULTS</button>
+            <a class="btn alt" href="#leaderboard">LEADERBOARD</a>
           </div>
-          <p class="note" id="shareMsg"></p>
+          <p class="note" id="shareMsg" role="status" aria-live="polite"></p>
           <p class="note">
             Keep playing to climb the leaderboard. Rarity here is simulated from a sample field of
             players.
@@ -129,14 +149,20 @@
         </div>
       </section>
 
-      <section class="view" id="v-leaderboard" hidden>
-        <h1>LEADERBOARD</h1>
-        <div class="tabs" role="tablist">
-          <button class="tab on" data-b="daily" type="button">DAILY</button
-          ><button class="tab" data-b="weekly" type="button">WEEKLY</button
-          ><button class="tab" data-b="all" type="button">ALL-TIME</button>
+      <section class="view" id="v-leaderboard" aria-labelledby="lbTitle" hidden>
+        <h1 id="lbTitle">LEADERBOARD</h1>
+        <div class="tabs" role="tablist" aria-label="Leaderboard timeframe">
+          <button class="tab on" data-b="daily" type="button" role="tab" aria-selected="true">
+            DAILY
+          </button>
+          <button class="tab" data-b="weekly" type="button" role="tab" aria-selected="false">
+            WEEKLY
+          </button>
+          <button class="tab" data-b="all" type="button" role="tab" aria-selected="false">
+            ALL-TIME
+          </button>
         </div>
-        <div class="panel">
+        <div class="panel" role="tabpanel">
           <div class="tw"><table id="lbT"></table></div>
         </div>
         <p class="note" style="margin-top: 12px">
@@ -144,15 +170,15 @@
         </p>
       </section>
 
-      <section class="view" id="v-archives" hidden>
-        <h1>CHALLENGE ARCHIVES</h1>
+      <section class="view" id="v-archives" aria-labelledby="arcTitle" hidden>
+        <h1 id="arcTitle">CHALLENGE ARCHIVES</h1>
         <p class="dim">
           Replay earlier challenges for practice. Archive runs do not change your streak or ranking.
         </p>
         <div class="grid g2" id="arcList"></div>
       </section>
 
-      <section class="view" id="v-profile" hidden>
+      <section class="view" id="v-profile" aria-labelledby="prName" hidden>
         <div class="panel">
           <div class="who" style="gap: 18px; flex-wrap: wrap">
             <img class="av l" id="prAv" alt="Your pixel avatar" />
@@ -167,8 +193,8 @@
         <div class="grid g2" id="prAch"></div>
       </section>
 
-      <section class="view" id="v-how" hidden>
-        <h1>HOW TO PLAY</h1>
+      <section class="view" id="v-how" aria-labelledby="howTitle" hidden>
+        <h1 id="howTitle">HOW TO PLAY</h1>
         <div class="grid g2">
           <div class="panel">
             <h2>THE GAME</h2>
@@ -202,15 +228,20 @@
         <div class="cta"><a class="btn big" href="#play">PLAY NOW</a></div>
       </section>
 
-      <section class="view" id="v-login" hidden>
+      <section class="view" id="v-login" aria-labelledby="loginTitle" hidden>
         <div class="panel" style="max-width: 460px">
-          <h1>LOGIN / REGISTER</h1>
+          <h1 id="loginTitle">LOGIN / REGISTER</h1>
           <form id="lgForm">
-            <label for="lgName">USERNAME</label
-            ><input id="lgName" maxlength="16" required placeholder="PLAYER_ONE" /><label
-              for="lgPass"
-              >PASSWORD</label
-            ><input
+            <label for="lgName">USERNAME</label>
+            <input
+              id="lgName"
+              maxlength="16"
+              required
+              autocomplete="username"
+              placeholder="PLAYER_ONE"
+            />
+            <label for="lgPass">PASSWORD</label>
+            <input
               id="lgPass"
               type="password"
               autocomplete="new-password"
@@ -225,14 +256,15 @@
         </div>
       </section>
     </main>
-    <script src="utils.js"></script>
-    <script src="data.js"></script>
-    <script src="storage.js"></script>
-    <script src="audio.js"></script>
-    <script src="art.js"></script>
-    <script src="board.js"></script>
-    <script src="game.js"></script>
-    <script src="views.js"></script>
-    <script src="main.js"></script>
+
+    <script src="utils.js" defer></script>
+    <script src="data.js" defer></script>
+    <script src="storage.js" defer></script>
+    <script src="audio.js" defer></script>
+    <script src="art.js" defer></script>
+    <script src="board.js" defer></script>
+    <script src="game.js" defer></script>
+    <script src="views.js" defer></script>
+    <script src="main.js" defer></script>
   </body>
 </html>
