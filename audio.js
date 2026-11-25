@@ -15,7 +15,7 @@
   var unlockBound = false;
 
   // Volume levels
-  var BGM_LEVEL = 0.14;
+  var BGM_LEVEL = 0.6;
   var SFX_LEVEL = 1.4;
 
   // Tempo & scheduler settings (retro synth-arcade groove)
