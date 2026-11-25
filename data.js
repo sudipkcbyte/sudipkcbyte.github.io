@@ -107,8 +107,8 @@
     luna: 'Moon',
     'mt fuji': 'Fuji',
     'mount fuji': 'Fuji',
-    'sagarmatha': 'Mount Everest',
-    'chomolungma': 'Mount Everest',
+    sagarmatha: 'Mount Everest',
+    chomolungma: 'Mount Everest',
   });
 
   function norm(str) {
@@ -225,8 +225,6 @@
     return { pts: 200, label: 'EXTREMELY RARE' };
   }
 
-  /* ---------- Date & Challenge Index ---------- */
-
   function dayIndex(dateObj) {
     var d = dateObj instanceof Date ? dateObj : new Date();
     var utcDayStart = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
@@ -258,8 +256,6 @@
       timeZone: 'UTC',
     });
   }
-
-  /* ---------- Fuzzy Spelling Suggestion ---------- */
 
   function lev(a, b) {
     var s1 = String(a || '');
