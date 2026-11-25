@@ -103,9 +103,7 @@
           memStore = normalized;
           return normalized;
         }
-      } catch (e) {
-        // Fall through to in-memory copy if JSON is corrupted or storage fails
-      }
+      } catch (e) {}
     }
     return memStore ? normalizeProfile(memStore) : null;
   }
