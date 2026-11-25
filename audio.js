@@ -5,6 +5,7 @@
   var S = RB.state || (RB.state = { soundOn: true });
 
   var AC = null;
+  var masterComp = null;
   var bgmGain = null;
   var sfxGain = null;
   var bgmTimer = null;
@@ -12,6 +13,10 @@
   var stepIndex = 0;
   var nextNoteTime = 0;
   var unlockBound = false;
+
+  // Volume levels
+  var BGM_LEVEL = 0.14;
+  var SFX_LEVEL = 1.4;
 
   // Tempo & scheduler settings (retro synth-arcade groove)
   var BPM = 128;
@@ -40,13 +45,22 @@
       if (!Ctx) return null;
       AC = new Ctx();
 
+      // Master compressor prevents distortion at higher volumes
+      masterComp = AC.createDynamicsCompressor();
+      masterComp.threshold.setValueAtTime(-14, AC.currentTime);
+      masterComp.knee.setValueAtTime(12, AC.currentTime);
+      masterComp.ratio.setValueAtTime(6, AC.currentTime);
+      masterComp.attack.setValueAtTime(0.003, AC.currentTime);
+      masterComp.release.setValueAtTime(0.15, AC.currentTime);
+      masterComp.connect(AC.destination);
+
       sfxGain = AC.createGain();
-      sfxGain.gain.value = 0.9;
-      sfxGain.connect(AC.destination);
+      sfxGain.gain.value = SFX_LEVEL;
+      sfxGain.connect(masterComp);
 
       bgmGain = AC.createGain();
-      bgmGain.gain.value = S.soundOn ? 0.032 : 0.0001;
-      bgmGain.connect(AC.destination);
+      bgmGain.gain.value = S.soundOn ? BGM_LEVEL : 0.0001;
+      bgmGain.connect(masterComp);
     }
     return AC;
   }
@@ -93,7 +107,7 @@
     osc.frequency.setValueAtTime(freq, startTime);
 
     env.gain.setValueAtTime(0.0001, startTime);
-    env.gain.linearRampToValueAtTime(peakGain, startTime + 0.012);
+    env.gain.linearRampToValueAtTime(peakGain, startTime + 0.01);
     env.gain.exponentialRampToValueAtTime(0.0001, endTime);
 
     osc.connect(env);
@@ -109,10 +123,10 @@
     var bassFreq = BASS_NOTES[idx];
 
     if (leadFreq > 0) {
-      scheduleTone(leadFreq, STEP_SEC * 0.78, 'square', time, bgmGain, 0.45);
+      scheduleTone(leadFreq, STEP_SEC * 0.78, 'square', time, bgmGain, 0.55);
     }
     if (bassFreq > 0) {
-      scheduleTone(bassFreq, STEP_SEC * 0.85, 'triangle', time, bgmGain, 0.85);
+      scheduleTone(bassFreq, STEP_SEC * 0.85, 'triangle', time, bgmGain, 0.95);
     }
   }
 
@@ -150,7 +164,7 @@
     var now = AC.currentTime;
     bgmGain.gain.cancelScheduledValues(now);
     bgmGain.gain.setValueAtTime(Math.max(0.0001, bgmGain.gain.value), now);
-    bgmGain.gain.exponentialRampToValueAtTime(active ? 0.032 : 0.0001, now + 0.08);
+    bgmGain.gain.exponentialRampToValueAtTime(active ? BGM_LEVEL : 0.0001, now + 0.08);
   }
 
   function syncBgmState() {
@@ -180,7 +194,7 @@
       }
 
       var t = ctx.currentTime + (delay || 0);
-      scheduleTone(f, d || 0.12, type || 'square', t, sfxGain, 0.065);
+      scheduleTone(f, d || 0.12, type || 'square', t, sfxGain, 0.18);
     } catch (e) {}
   }
 
@@ -199,7 +213,6 @@
     });
   }
 
-  // Initialize unlock listeners right away
   bindUnlockListeners();
   if (S.soundOn) {
     syncBgmState();
