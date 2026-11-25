@@ -5,8 +5,9 @@
   var S = RB.state || (RB.state = { soundOn: true });
 
   var AC = null;
-  var masterComp = null;
   var saturator = null;
+  var masterComp = null;
+  var presenceBoost = null;
   var makeupGain = null;
   var bgmGain = null;
   var sfxGain = null;
@@ -16,18 +17,16 @@
   var nextNoteTime = 0;
   var unlockBound = false;
 
-  // Tune loudness here (higher = louder)
-  var BGM_LEVEL = 0.75;
-  var SFX_LEVEL = 2.6;
-  var MAKEUP_GAIN = 2.2;
+  // Higher output levels + midrange presence for clear PC audio
+  var BGM_LEVEL = 0.85;
+  var SFX_LEVEL = 3.0;
+  var MAKEUP_GAIN = 3.0;
 
-  // Tempo & scheduler settings (retro synth-arcade groove)
   var BPM = 128;
-  var STEP_SEC = 60 / BPM / 4; // 16th notes
+  var STEP_SEC = 60 / BPM / 4;
   var LOOKAHEAD_MS = 100;
   var SCHEDULE_AHEAD_SEC = 0.22;
 
-  // 32-step (2-bar) 8-bit lead & bass patterns (Hz; 0 = rest)
   var LEAD_NOTES = [
     659.25, 659.25, 783.99, 783.99, 880.0, 880.0, 783.99, 659.25,
     587.33, 587.33, 659.25, 659.25, 783.99, 659.25, 587.33, 493.88,
@@ -45,7 +44,7 @@
   function makeSaturationCurve(amount) {
     var samples = 44100;
     var curve = new Float32Array(samples);
-    var k = typeof amount === 'number' ? amount : 35;
+    var k = typeof amount === 'number' ? amount : 40;
     for (var i = 0; i < samples; i++) {
       var x = (i * 2) / samples - 1;
       curve[i] = ((3 + k) * x * 20 * (Math.PI / 180)) / (Math.PI + k * Math.abs(x));
@@ -70,6 +69,12 @@
       masterComp.attack.setValueAtTime(0.002, AC.currentTime);
       masterComp.release.setValueAtTime(0.12, AC.currentTime);
 
+      presenceBoost = AC.createBiquadFilter();
+      presenceBoost.type = 'peaking';
+      presenceBoost.frequency.setValueAtTime(2200, AC.currentTime);
+      presenceBoost.Q.setValueAtTime(1.2, AC.currentTime);
+      presenceBoost.gain.setValueAtTime(7, AC.currentTime);
+
       makeupGain = AC.createGain();
       makeupGain.gain.value = MAKEUP_GAIN;
 
@@ -82,7 +87,8 @@
       sfxGain.connect(saturator);
       bgmGain.connect(saturator);
       saturator.connect(masterComp);
-      masterComp.connect(makeupGain);
+      masterComp.connect(presenceBoost);
+      presenceBoost.connect(makeupGain);
       makeupGain.connect(AC.destination);
     }
     return AC;
@@ -205,8 +211,6 @@
       startBgmLoop();
     }
   }
-
-  /* ---------- Sound Effects ---------- */
 
   function beep(f, d, type, delay) {
     if (!S.soundOn) return;
