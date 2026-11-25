@@ -21,13 +21,7 @@
     soundOn: true,
   };
 
-  function $(selector, scope) {
-    if (!selector) return null;
-    var root = scope && typeof scope.querySelector === 'function' ? scope : document;
-    return root.querySelector(selector);
-  }
-
-  function $$(selector, scope) {
+  function $(selector, scope) { if (!selector) return null; var root = scope && typeof scope.querySelector === 'function' ? scope : document; return root.querySelector(selector); }    function $$(selector, scope) {
     if (!selector) return [];
     var root = scope && typeof scope.querySelectorAll === 'function' ? scope : document;
     return Array.prototype.slice.call(root.querySelectorAll(selector));
@@ -40,7 +34,6 @@
     });
   }
 
-  // Mulberry32 deterministic PRNG returning [0, 1)
   function rng(seed) {
     var numericSeed = Number(seed);
     var state = (Number.isFinite(numericSeed) ? Math.floor(numericSeed) : 0) >>> 0;
@@ -79,8 +72,9 @@
   }
 
   Object.assign(RB, {
-    $: $,
-    $$: $$,
+    $:$,
+    $$:$$
+,
     esc: esc,
     rng: rng,
     rngInt: rngInt,
