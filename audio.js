@@ -6,6 +6,8 @@
 
   var AC = null;
   var masterComp = null;
+  var saturator = null;
+  var makeupGain = null;
   var bgmGain = null;
   var sfxGain = null;
   var bgmTimer = null;
@@ -14,9 +16,10 @@
   var nextNoteTime = 0;
   var unlockBound = false;
 
-  // Volume levels
-  var BGM_LEVEL = 1.2;
-  var SFX_LEVEL = 1.4;
+  // Tune loudness here (higher = louder)
+  var BGM_LEVEL = 0.75;
+  var SFX_LEVEL = 2.6;
+  var MAKEUP_GAIN = 2.2;
 
   // Tempo & scheduler settings (retro synth-arcade groove)
   var BPM = 128;
@@ -26,18 +29,29 @@
 
   // 32-step (2-bar) 8-bit lead & bass patterns (Hz; 0 = rest)
   var LEAD_NOTES = [
-    659.25, 0, 783.99, 0, 880.0, 0, 783.99, 659.25,
-    587.33, 0, 659.25, 0, 783.99, 659.25, 587.33, 493.88,
-    523.25, 0, 659.25, 0, 783.99, 0, 880.0, 783.99,
-    659.25, 587.33, 493.88, 587.33, 659.25, 0, 0, 0,
+    659.25, 659.25, 783.99, 783.99, 880.0, 880.0, 783.99, 659.25,
+    587.33, 587.33, 659.25, 659.25, 783.99, 659.25, 587.33, 493.88,
+    523.25, 523.25, 659.25, 659.25, 783.99, 783.99, 880.0, 783.99,
+    659.25, 587.33, 493.88, 587.33, 659.25, 659.25, 493.88, 0,
   ];
 
   var BASS_NOTES = [
-    130.81, 0, 130.81, 196.0, 130.81, 0, 130.81, 196.0,
-    98.0,   0, 98.0,   146.83, 98.0,   0, 98.0,   146.83,
-    110.0,  0, 110.0,  164.81, 110.0,  0, 110.0,  164.81,
-    87.31,  0, 98.0,   0,      130.81, 0, 196.0,  0,
+    261.63, 261.63, 392.0, 261.63, 261.63, 392.0, 261.63, 392.0,
+    196.0,  196.0,  293.66, 196.0, 196.0,  293.66, 196.0, 293.66,
+    220.0,  220.0,  329.63, 220.0, 220.0,  329.63, 220.0, 329.63,
+    174.61, 196.0,  261.63, 261.63, 392.0, 392.0, 261.63, 0,
   ];
+
+  function makeSaturationCurve(amount) {
+    var samples = 44100;
+    var curve = new Float32Array(samples);
+    var k = typeof amount === 'number' ? amount : 35;
+    for (var i = 0; i < samples; i++) {
+      var x = (i * 2) / samples - 1;
+      curve[i] = ((3 + k) * x * 20 * (Math.PI / 180)) / (Math.PI + k * Math.abs(x));
+    }
+    return curve;
+  }
 
   function ensureContext() {
     if (!AC) {
@@ -45,22 +59,31 @@
       if (!Ctx) return null;
       AC = new Ctx();
 
-      // Master compressor prevents distortion at higher volumes
+      saturator = AC.createWaveShaper();
+      saturator.curve = makeSaturationCurve(40);
+      saturator.oversample = '2x';
+
       masterComp = AC.createDynamicsCompressor();
-      masterComp.threshold.setValueAtTime(-14, AC.currentTime);
-      masterComp.knee.setValueAtTime(12, AC.currentTime);
-      masterComp.ratio.setValueAtTime(6, AC.currentTime);
-      masterComp.attack.setValueAtTime(0.003, AC.currentTime);
-      masterComp.release.setValueAtTime(0.15, AC.currentTime);
-      masterComp.connect(AC.destination);
+      masterComp.threshold.setValueAtTime(-4, AC.currentTime);
+      masterComp.knee.setValueAtTime(10, AC.currentTime);
+      masterComp.ratio.setValueAtTime(4, AC.currentTime);
+      masterComp.attack.setValueAtTime(0.002, AC.currentTime);
+      masterComp.release.setValueAtTime(0.12, AC.currentTime);
+
+      makeupGain = AC.createGain();
+      makeupGain.gain.value = MAKEUP_GAIN;
 
       sfxGain = AC.createGain();
       sfxGain.gain.value = SFX_LEVEL;
-      sfxGain.connect(masterComp);
 
       bgmGain = AC.createGain();
       bgmGain.gain.value = S.soundOn ? BGM_LEVEL : 0.0001;
-      bgmGain.connect(masterComp);
+
+      sfxGain.connect(saturator);
+      bgmGain.connect(saturator);
+      saturator.connect(masterComp);
+      masterComp.connect(makeupGain);
+      makeupGain.connect(AC.destination);
     }
     return AC;
   }
@@ -101,14 +124,14 @@
 
     var osc = AC.createOscillator();
     var env = AC.createGain();
-    var endTime = Math.max(startTime + 0.015, startTime + duration);
+    var endTime = Math.max(startTime + 0.02, startTime + duration);
 
     osc.type = type || 'square';
     osc.frequency.setValueAtTime(freq, startTime);
 
-    env.gain.setValueAtTime(0.0001, startTime);
-    env.gain.linearRampToValueAtTime(peakGain, startTime + 0.01);
-    env.gain.exponentialRampToValueAtTime(0.0001, endTime);
+    env.gain.setValueAtTime(0.001, startTime);
+    env.gain.linearRampToValueAtTime(peakGain, startTime + 0.008);
+    env.gain.exponentialRampToValueAtTime(0.001, endTime);
 
     osc.connect(env);
     env.connect(gainNode);
@@ -123,10 +146,11 @@
     var bassFreq = BASS_NOTES[idx];
 
     if (leadFreq > 0) {
-      scheduleTone(leadFreq, STEP_SEC * 0.78, 'square', time, bgmGain, 0.55);
+      scheduleTone(leadFreq, STEP_SEC * 0.94, 'square', time, bgmGain, 1.0);
+      scheduleTone(leadFreq * 0.5, STEP_SEC * 0.85, 'sawtooth', time, bgmGain, 0.45);
     }
     if (bassFreq > 0) {
-      scheduleTone(bassFreq, STEP_SEC * 0.85, 'triangle', time, bgmGain, 0.95);
+      scheduleTone(bassFreq, STEP_SEC * 0.94, 'square', time, bgmGain, 0.85);
     }
   }
 
@@ -164,7 +188,7 @@
     var now = AC.currentTime;
     bgmGain.gain.cancelScheduledValues(now);
     bgmGain.gain.setValueAtTime(Math.max(0.0001, bgmGain.gain.value), now);
-    bgmGain.gain.exponentialRampToValueAtTime(active ? BGM_LEVEL : 0.0001, now + 0.08);
+    bgmGain.gain.exponentialRampToValueAtTime(active ? BGM_LEVEL : 0.0001, now + 0.06);
   }
 
   function syncBgmState() {
@@ -194,7 +218,7 @@
       }
 
       var t = ctx.currentTime + (delay || 0);
-      scheduleTone(f, d || 0.12, type || 'square', t, sfxGain, 0.18);
+      scheduleTone(f, d || 0.14, type || 'square', t, sfxGain, 0.55);
     } catch (e) {}
   }
 
@@ -209,7 +233,7 @@
     }[pts] || [330];
 
     notes.forEach(function (f, i) {
-      beep(f, 0.14, pts ? 'square' : 'sawtooth', i * 0.1);
+      beep(f, 0.15, pts ? 'square' : 'sawtooth', i * 0.1);
     });
   }
 
